@@ -1,29 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Syndicate L0 - Energy Core</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #00ff00; font-family: monospace; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .core { width: 200px; height: 200px; border: 2px solid #00ff00; border-radius: 50%; box-shadow: 0 0 50px #00ff00; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: b 3s infinite; }
-        .val { font-size: 40px; color: #fff; text-shadow: 0 0 10px #00ff00; }
-        @keyframes b { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
-        .btn { margin-top: 40px; border: 1px solid #00ff00; color: #00ff00; background: none; padding: 10px 30px; border-radius: 20px; }
+        body { background: #05000a; color: #bc13fe; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+        
+        /* Сетка на фоне */
+        .grid { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(188, 19, 254, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(188, 19, 254, 0.05) 1px, transparent 1px); background-size: 30px 30px; transform: perspective(500px) rotateX(60deg); bottom: -50%; z-index: 0; }
+
+        .top-info { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; font-size: 11px; color: #00d4ff; border-bottom: 1px solid rgba(0, 212, 255, 0.3); padding-bottom: 5px; z-index: 2; text-shadow: 0 0 5px #00d4ff; }
+
+        .core-wrap { position: relative; z-index: 2; }
+
+        /* Само Ядро */
+        .energy-core { 
+            width: 240px; height: 240px; border-radius: 50%; 
+            border: 2px solid #bc13fe; 
+            background: radial-gradient(circle, #2a004f 0%, #05000a 70%);
+            box-shadow: 0 0 40px #bc13fe, inset 0 0 30px #00d4ff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            animation: pulse-purple 4s ease-in-out infinite; 
+        }
+
+        /* Синие волны (кольца) */
+        .blue-wave { 
+            position: absolute; border: 1px solid #00d4ff; border-radius: 50%; 
+            animation: wave-out 3s linear infinite; opacity: 0; 
+        }
+
+        .val-big { font-size: 55px; color: #fff; text-shadow: 0 0 25px #bc13fe, 0 0 5px #00d4ff; font-weight: bold; }
+        .unit { font-size: 12px; color: #00d4ff; letter-spacing: 4px; margin: 5px 0; font-weight: bold; }
+
+        @keyframes pulse-purple { 0%, 100% { transform: scale(1); box-shadow: 0 0 40px #bc13fe; } 50% { transform: scale(1.05); box-shadow: 0 0 70px #bc13fe, 0 0 20px #00d4ff; } }
+        @keyframes wave-out { 0% { width: 240px; height: 240px; opacity: 0.6; } 100% { width: 450px; height: 450px; opacity: 0; } }
+
+        .btn-exit { margin-top: 60px; background: rgba(188, 19, 254, 0.1); border: 1px solid #00d4ff; color: #00d4ff; padding: 12px 45px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: 0.3s; z-index: 2; box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
     </style>
 </head>
 <body>
-    <div id="up" style="position:absolute; top:20px; font-size:10px;">UP: 00:00:00</div>
-    <div class="core">
-        <div style="font-size:12px;">POWER</div>
-        <div id="h" class="val">115.4</div>
-        <div style="font-size:10px;">TH/S</div>
+    <div class="grid"></div>
+    <div class="top-info"><span>SYSTEM: ACTIVE</span><span id="uptime">UP: 00:00:00</span></div>
+    
+    <div class="core-wrap">
+        <div class="blue-wave" style="animation-delay: 0s"></div>
+        <div class="blue-wave" style="animation-delay: 1.5s"></div>
+        <div class="energy-core">
+            <div class="unit">VOLTAGE</div>
+            <div class="val-big" id="power">220.5</div>
+            <div class="unit">GW/H</div>
+        </div>
     </div>
-    <button class="btn" onclick="window.Telegram.WebApp.close()">CLOSE</button>
+
+    <button class="btn-exit" onclick="window.Telegram.WebApp.close()">DISCONNECT</button>
+
     <script>
         window.Telegram.WebApp.expand();
-        setInterval(() => { document.getElementById('h').innerText = (115.4 + (Math.random()*0.4-0.2)).toFixed(1); }, 3000);
-        let s = 0; setInterval(() => { s++; let m = Math.floor(s/60); let sec = s%60; document.getElementById('up').innerText = `UP: 00:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`; }, 1000);
+        // Рандом цифр
+        setInterval(() => {
+            let base = 220.5;
+            let drift = (Math.random() * 0.6 - 0.3).toFixed(1);
+            document.getElementById('power').innerText = (parseFloat(base) + parseFloat(drift)).toFixed(1);
+        }, 2000);
+
+        // Таймер
+        let s = 0;
+        setInterval(() => {
+            s++;
+            let h = Math.floor(s / 3600).toString().padStart(2, '0');
+            let m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+            let sec = (s % 60).toString().padStart(2, '0');
+            document.getElementById('uptime').innerText = `UP: ${h}:${m}:${sec}`;
+        }, 1000);
     </script>
 </body>
 </html>
