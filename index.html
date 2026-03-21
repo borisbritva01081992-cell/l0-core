@@ -9,7 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #050505;
+            background: radial-gradient(circle at center, #1a0033 0%, #050505 100%);
             color: #00f2ff;
             font-family: 'Courier New', monospace;
             overflow: hidden;
@@ -36,23 +36,41 @@
         }
 
         .core-circle {
-            width: 200px;
-            height: 200px;
-            border: 2px solid #00f2ff;
+            width: 220px;
+            height: 220px;
+            /* Градиентная рамка */
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #ff00ea, #00f2ff, #ff00ea) 1;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
-            box-shadow: 0 0 30px #00f2ff66;
+            /* Мощное пульсирующее свечение (Корона) */
+            box-shadow: 0 0 50px #ff00ea, 0 0 100px #00f2ff, inset 0 0 30px #ff00ea;
             cursor: pointer;
             pointer-events: auto;
-            transition: transform 0.1s;
-            background: rgba(0, 242, 255, 0.05);
+            transition: transform 0.1s, box-shadow 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            animation: corePulse 2s infinite alternate;
+        }
+
+        @keyframes corePulse {
+            0% { box-shadow: 0 0 40px #ff00ea66, 0 0 80px #00f2ff66; }
+            100% { box-shadow: 0 0 70px #ff00ea, 0 0 120px #00f2ff; }
         }
 
         .core-circle:active {
             transform: scale(0.95);
+            box-shadow: 0 0 20px #ff00ea, 0 0 40px #00f2ff;
+        }
+
+        #corePower {
+            font-size: 24px;
+            background: linear-gradient(90deg, #ff00ea, #00f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
         }
 
         .status-box {
@@ -60,13 +78,16 @@
             border: 1px solid #00f2ff;
             padding: 15px;
             margin-top: 10px;
-            width: 280px;
+            width: 300px;
+            box-shadow: 0 0 20px #00f2ff33;
         }
 
         .overunity-tag {
             color: #ff00ea;
             font-weight: bold;
             animation: blink 1s infinite;
+            font-size: 12px;
+            margin-bottom: 10px;
         }
 
         @keyframes blink {
@@ -75,16 +96,17 @@
 
         .bar-container {
             width: 100%;
-            height: 5px;
+            height: 8px;
             background: #111;
             margin-top: 10px;
+            border: 1px solid #00f2ff;
         }
 
         #progress {
             height: 100%;
-            width: 30%;
-            background: #00f2ff;
-            box-shadow: 0 0 10px #00f2ff;
+            width: 45%;
+            background: linear-gradient(90deg, #ff00ea, #00f2ff);
+            box-shadow: 0 0 15px #00f2ff;
         }
     </style>
 </head>
@@ -95,7 +117,7 @@
     <div class="ui-container">
         <div class="overunity-tag">ETHER EXTRACTION ACTIVE [OVERUNITY > 100%]</div>
         <div class="core-circle" id="coreTrigger">
-            <div id="corePower">1.21 GW</div>
+            <div id="corePower">1.88 GW</div>
         </div>
         <div class="status-box">
             <div>SYSTEM: <span id="statusText">STABLE</span></div>
@@ -111,8 +133,9 @@
         const coreTrigger = document.getElementById('coreTrigger');
         const powerDisplay = document.getElementById('corePower');
         
-        let power = 1.21;
+        let power = 1.88;
         let particles = [];
+        const colors = ['#ff00ea', '#00f2ff', '#7000ff'];
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -124,31 +147,35 @@
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2;
-                // Частицы стремятся к центру (сбор энергии из воздуха)
-                this.speedX = (canvas.width/2 - this.x) * 0.01;
-                this.speedY = (canvas.height/2 - this.y) * 0.01;
-                this.opacity = Math.random();
+                this.size = Math.random() * 3;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.speedX = (canvas.width/2 - this.x) * (0.005 + Math.random() * 0.01);
+                this.speedY = (canvas.height/2 - this.y) * (0.005 + Math.random() * 0.01);
+                this.opacity = Math.random() * 0.8 + 0.2;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (Math.abs(this.x - canvas.width/2) < 10) this.reset();
+                if (Math.abs(this.x - canvas.width/2) < 20 && Math.abs(this.y - canvas.height/2) < 20) this.reset();
             }
             draw() {
-                ctx.fillStyle = `rgba(0, 242, 255, ${this.opacity})`;
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.globalAlpha = 1;
             }
         }
 
         function init() {
-            for (let i = 0; i < 100; i++) particles.push(new Particle());
+            for (let i = 0; i < 150; i++) particles.push(new Particle());
         }
 
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Легкий след от частиц
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.update();
                 p.draw();
@@ -157,10 +184,10 @@
         }
 
         coreTrigger.addEventListener('click', () => {
-            power += 0.05;
+            power += 0.08;
             powerDisplay.innerText = power.toFixed(2) + " GW";
-            // Эффект вспышки при захвате энергии
-            ctx.fillStyle = 'rgba(0, 242, 255, 0.2)';
+            // Эффект квантового разряда при клике
+            ctx.fillStyle = 'rgba(255, 0, 234, 0.3)';
             ctx.fillRect(0,0, canvas.width, canvas.height);
         });
 
@@ -170,3 +197,4 @@
     </script>
 </body>
 </html>
+
