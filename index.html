@@ -2,254 +2,171 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SYNDICATE L0 | CORE TERMINAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>L0 CORE - ETHER EXTRACTOR</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --primary: #00f2fe; /* Неоновый голубой */
-            --secondary: #4facfe; /* Насыщенный синий */
-            --bg: #00040f; /* Глубокий черный (космос) */
-            --text: #e0f7fa;
-            --matrix: #0f0; /* Зеленый статус */
-            --font: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: var(--font);
-            overflow: hidden; /* Запрет скролла */
+            background-color: #050505;
+            color: #00f2ff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            text-shadow: 0 0 10px #00f2ff;
         }
 
-        /* Фон с частицами */
-        #particles-js {
+        #canvas {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            top: 0;
+            left: 0;
             z-index: 1;
         }
 
-        /* Сетка Web App */
-        .terminal-container {
+        .ui-container {
             position: relative;
-            width: 90%;
-            max-width: 400px;
-            height: 85vh;
-            background: rgba(0, 10, 30, 0.6);
-            border: 2px solid var(--primary);
-            border-radius: 15px;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-            z-index: 10;
-            backdrop-filter: blur(5px);
-        }
-
-        /* Хедер Терминала */
-        .header {
+            z-index: 2;
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.3);
-            padding-bottom: 10px;
+            pointer-events: none;
         }
 
-        .header h1 {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--primary);
-            margin: 0;
-            text-shadow: 0 0 10px var(--primary);
-        }
-
-        .header span {
-            font-size: 0.8rem;
-            color: var(--secondary);
-            opacity: 0.8;
-        }
-
-        /* Центральное Ядро (Пульсация) */
-        .core-viz {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .core-sphere {
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, var(--primary) 0%, rgba(0,0,0,0) 70%);
+        .core-circle {
+            width: 200px;
+            height: 200px;
+            border: 2px solid #00f2ff;
             border-radius: 50%;
-            box-shadow: 0 0 40px var(--primary);
-            animation: pulse 3s infinite ease-in-out;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .core-sphere:active {
-            transform: scale(0.9);
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--primary); }
-            50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(0, 242, 254, 0.7); }
-        }
-
-        /* Графики и Статус (Инфо-панель) */
-        .status-panel {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            font-family: 'Courier New', Courier, monospace; /* Моноширинный шрифт */
-            font-size: 0.8rem;
-        }
-
-        .status-item {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .status-label { color: var(--secondary); }
-        .status-value { color: var(--text); }
-        .status-value.ok { color: var(--matrix); }
-
-        /* Имитация графика */
-        .chart {
-            height: 40px;
-            background: repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0, 242, 254, 0.1) 5px, rgba(0, 242, 254, 0.1) 10px);
-            margin-top: 10px;
-            border-bottom: 1px solid var(--primary);
-            position: relative;
-        }
-        
-        .chart-line {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            stroke: var(--primary);
-            stroke-width: 2;
-            fill: none;
-        }
-
-        /* Кнопка Закрыть */
-        .close-btn {
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            border: none;
-            color: #000;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-top: 20px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px #00f2ff66;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
-            transition: box-shadow 0.3s;
+            pointer-events: auto;
+            transition: transform 0.1s;
+            background: rgba(0, 242, 255, 0.05);
         }
 
-        .close-btn:hover { box-shadow: 0 0 25px var(--primary); }
-        .close-btn:active { transform: scale(0.98); }
+        .core-circle:active {
+            transform: scale(0.95);
+        }
 
+        .status-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00f2ff;
+            padding: 15px;
+            margin-top: 10px;
+            width: 280px;
+        }
+
+        .overunity-tag {
+            color: #ff00ea;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.3; }
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 5px;
+            background: #111;
+            margin-top: 10px;
+        }
+
+        #progress {
+            height: 100%;
+            width: 30%;
+            background: #00f2ff;
+            box-shadow: 0 0 10px #00f2ff;
+        }
     </style>
 </head>
 <body>
 
-    <div id="particles-js"></div>
+    <canvas id="canvas"></canvas>
 
-    <div class="terminal-container">
-        <div class="header">
-            <h1>L0 CORE ACTIVATED</h1>
-            <span>Node #081992 | Tier-1 Access</span>
+    <div class="ui-container">
+        <div class="overunity-tag">ETHER EXTRACTION ACTIVE [OVERUNITY > 100%]</div>
+        <div class="core-circle" id="coreTrigger">
+            <div id="corePower">1.21 GW</div>
         </div>
-
-        <div class="core-viz">
-            <div class="core-sphere" id="coreTrigger"></div>
+        <div class="status-box">
+            <div>SYSTEM: <span id="statusText">STABLE</span></div>
+            <div>SOURCE: QUANTUM VACUUM</div>
+            <div class="bar-container"><div id="progress"></div></div>
+            <div style="margin-top: 10px; font-size: 10px; opacity: 0.7;">NO INPUT ENERGY REQUIRED</div>
         </div>
-
-        <div class="status-panel">
-            <div class="status-item">
-                <span class="status-label">Протокол:</span>
-                <span class="status-value">Quantum L0 Hybrid</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Синхронизация:</span>
-                <span class="status-value ok">100% (ONLINE)</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Мощность Реактора:</span>
-                <span class="status-value" id="powerValue">9.8 GW</span>
-            </div>
-            <div class="chart">
-                 <svg class="chart-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-                    <polyline points="0,40 10,35 20,38 30,30 40,32 50,25 60,28 70,20 80,22 90,15 100,18" stroke="#00f2fe" stroke-width="2" fill="none"/>
-                </svg>
-            </div>
-        </div>
-
-        <button class="close-btn" id="closeBtn">Закрыть Терминал</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
-        tg.ready();
-
-        // Настройка Частиц (Particles)
-        particlesJS("particles-js", {
-            particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: "#00f2fe" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: true, distance: 150, color: "#00f2fe", opacity: 0.2, width: 1 },
-                move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
-            },
-            interactivity: {
-                detect_on: "canvas",
-                events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
-                modes: { grab: { distance: 200, line_linked: { opacity: 0.5 } }, push: { particles_nb: 4 } }
-            },
-            retina_detect: true
-        });
-
-        // Логика кнопок
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
         const coreTrigger = document.getElementById('coreTrigger');
-        const powerValue = document.getElementById('powerValue');
-        const closeBtn = document.getElementById('closeBtn');
+        const powerDisplay = document.getElementById('corePower');
+        
+        let power = 1.21;
+        let particles = [];
 
-        // Эффект при клике на Ядро
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                // Частицы стремятся к центру (сбор энергии из воздуха)
+                this.speedX = (canvas.width/2 - this.x) * 0.01;
+                this.speedY = (canvas.height/2 - this.y) * 0.01;
+                this.opacity = Math.random();
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (Math.abs(this.x - canvas.width/2) < 10) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(0, 242, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < 100; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
         coreTrigger.addEventListener('click', () => {
-            powerValue.innerText = (parseFloat(powerValue.innerText) + 0.1).toFixed(1) + " GW";
-            coreTrigger.style.animation = "pulse 0.3s infinite ease-in-out"; // Ускоряем пульсацию
-            tg.HapticFeedback.impactOccurred('medium'); // Вибрация Телеграма
-            setTimeout(() => {
-                coreTrigger.style.animation = "pulse 3s infinite ease-in-out";
-            }, 1000);
+            power += 0.05;
+            powerDisplay.innerText = power.toFixed(2) + " GW";
+            // Эффект вспышки при захвате энергии
+            ctx.fillStyle = 'rgba(0, 242, 255, 0.2)';
+            ctx.fillRect(0,0, canvas.width, canvas.height);
         });
 
-        closeBtn.addEventListener('click', () => {
-            tg.close(); // Закрыть Web App
-        });
-
+        init();
+        animate();
+        Telegram.WebApp.ready();
     </script>
 </body>
 </html>
