@@ -3,77 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Syndicate L0 - Energy Core</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #05000a; color: #bc13fe; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+        body { background: #05000a; color: #bc13fe; font-family: monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; user-select: none; }
         
-        /* Сетка на фоне */
-        .grid { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(188, 19, 254, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(188, 19, 254, 0.05) 1px, transparent 1px); background-size: 30px 30px; transform: perspective(500px) rotateX(60deg); bottom: -50%; z-index: 0; }
+        /* Сетка фона */
+        .bg-grid { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(188, 19, 254, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(188, 19, 254, 0.1) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg); bottom: -50%; z-index: 0; opacity: 0.5; }
 
-        .top-info { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; font-size: 11px; color: #00d4ff; border-bottom: 1px solid rgba(0, 212, 255, 0.3); padding-bottom: 5px; z-index: 2; text-shadow: 0 0 5px #00d4ff; }
+        /* Логи в углу */
+        #logs { position: absolute; top: 60px; left: 20px; font-size: 8px; color: #00d4ff; line-height: 1.5; z-index: 10; text-shadow: 0 0 5px #00d4ff; max-width: 150px; }
 
-        .core-wrap { position: relative; z-index: 2; }
+        .top-info { position: absolute; top: 25px; width: 90%; display: flex; justify-content: space-between; font-size: 10px; color: #00d4ff; z-index: 10; border-bottom: 1px solid rgba(0, 212, 255, 0.3); padding-bottom: 5px; }
 
-        /* Само Ядро */
-        .energy-core { 
-            width: 240px; height: 240px; border-radius: 50%; 
-            border: 2px solid #bc13fe; 
-            background: radial-gradient(circle, #2a004f 0%, #05000a 70%);
-            box-shadow: 0 0 40px #bc13fe, inset 0 0 30px #00d4ff;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            animation: pulse-purple 4s ease-in-out infinite; 
-        }
+        /* Ядро */
+        .core-box { position: relative; display: flex; justify-content: center; align-items: center; width: 280px; height: 280px; z-index: 5; }
+        .energy-core { width: 180px; height: 180px; border-radius: 50%; border: 2px solid #bc13fe; background: radial-gradient(circle, #2a004f 0%, #05000a 80%); box-shadow: 0 0 40px #bc13fe; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: pulse 3s ease-in-out infinite; transition: 0.3s; }
+        .wave { position: absolute; border: 1px solid #00d4ff; border-radius: 50%; width: 180px; height: 180px; opacity: 0; animation: expand 3s linear infinite; }
 
-        /* Синие волны (кольца) */
-        .blue-wave { 
-            position: absolute; border: 1px solid #00d4ff; border-radius: 50%; 
-            animation: wave-out 3s linear infinite; opacity: 0; 
-        }
+        /* Сканер отпечатка */
+        .fingerprint-box { margin-top: 40px; display: flex; flex-direction: column; align-items: center; z-index: 10; cursor: pointer; }
+        .finger-icon { width: 50px; height: 50px; border: 1px solid #00d4ff; border-radius: 10px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(0, 212, 255, 0.3); transition: 0.2s; position: relative; overflow: hidden; }
+        .finger-icon:active { transform: scale(0.9); box-shadow: 0 0 30px #00ffcc; border-color: #00ffcc; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: #00ffcc; top: 0; animation: scan 2s linear infinite; box-shadow: 0 0 10px #00ffcc; }
 
-        .val-big { font-size: 55px; color: #fff; text-shadow: 0 0 25px #bc13fe, 0 0 5px #00d4ff; font-weight: bold; }
-        .unit { font-size: 12px; color: #00d4ff; letter-spacing: 4px; margin: 5px 0; font-weight: bold; }
+        /* Анимации */
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 60px #bc13fe; } }
+        @keyframes expand { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(2.2); opacity: 0; } }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
-        @keyframes pulse-purple { 0%, 100% { transform: scale(1); box-shadow: 0 0 40px #bc13fe; } 50% { transform: scale(1.05); box-shadow: 0 0 70px #bc13fe, 0 0 20px #00d4ff; } }
-        @keyframes wave-out { 0% { width: 240px; height: 240px; opacity: 0.6; } 100% { width: 450px; height: 450px; opacity: 0; } }
-
-        .btn-exit { margin-top: 60px; background: rgba(188, 19, 254, 0.1); border: 1px solid #00d4ff; color: #00d4ff; padding: 12px 45px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: 0.3s; z-index: 2; box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
+        .val { font-size: 40px; color: #fff; text-shadow: 0 0 20px #bc13fe; font-weight: bold; }
+        .exit-btn { margin-top: 30px; background: none; border: 1px solid rgba(188, 19, 254, 0.5); color: #bc13fe; padding: 5px 20px; border-radius: 5px; font-size: 9px; }
     </style>
 </head>
 <body>
-    <div class="grid"></div>
-    <div class="top-info"><span>SYSTEM: ACTIVE</span><span id="uptime">UP: 00:00:00</span></div>
-    
-    <div class="core-wrap">
-        <div class="blue-wave" style="animation-delay: 0s"></div>
-        <div class="blue-wave" style="animation-delay: 1.5s"></div>
-        <div class="energy-core">
-            <div class="unit">VOLTAGE</div>
-            <div class="val-big" id="power">220.5</div>
-            <div class="unit">GW/H</div>
+    <div class="bg-grid"></div>
+    <div id="logs">> ИНИЦИАЛИЗАЦИЯ...<br>> ПОИСК УЗЛОВ...<br>> СИСТЕМА СТАБИЛЬНА...</div>
+    <div class="top-info"><span>L0_PROTOCOL: ACTIVE</span><span id="tm">00:00:00</span></div>
+
+    <div class="core-box">
+        <div class="wave" style="animation-delay: 0s"></div>
+        <div class="wave" style="animation-delay: 1.5s"></div>
+        <div class="energy-core" id="core">
+            <div style="font-size:9px; color:#00d4ff;">VOLTAGE</div>
+            <div class="val" id="num">220.4</div>
+            <div style="font-size:9px; letter-spacing:3px;">KV/H</div>
         </div>
     </div>
 
-    <button class="btn-exit" onclick="window.Telegram.WebApp.close()">DISCONNECT</button>
+    <div class="fingerprint-box" onclick="startScan()">
+        <div class="finger-icon">
+            <div class="scan-line"></div>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="1" stroke-linecap="round"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.005-3.83c-.906-2.03-1.403-4.282-1.403-6.641 0-4.418 3.582-8 8-8s8 3.582 8 8c0 2.187-.879 4.17-2.304 5.608M15 11c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z"/></svg>
+        </div>
+        <div style="font-size: 8px; margin-top: 10px; color: #00d4ff;">ID: SCAN TO SYNC</div>
+    </div>
+
+    <button class="exit-btn" onclick="window.Telegram.WebApp.close()">DISCONNECT</button>
 
     <script>
-        window.Telegram.WebApp.expand();
-        // Рандом цифр
-        setInterval(() => {
-            let base = 220.5;
-            let drift = (Math.random() * 0.6 - 0.3).toFixed(1);
-            document.getElementById('power').innerText = (parseFloat(base) + parseFloat(drift)).toFixed(1);
-        }, 2000);
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // Таймер
-        let s = 0;
-        setInterval(() => {
-            s++;
-            let h = Math.floor(s / 3600).toString().padStart(2, '0');
-            let m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
-            let sec = (s % 60).toString().padStart(2, '0');
-            document.getElementById('uptime').innerText = `UP: ${h}:${m}:${sec}`;
-        }, 1000);
+        function startScan() {
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+            const logBox = document.getElementById('logs');
+            const core = document.getElementById('core');
+            
+            // Визуальный эффект
+            core.style.borderColor = "#00ffcc";
+            core.style.boxShadow = "0 0 80px #00ffcc";
+            
+            const logs = ["> СКАНЕР: OK", "> ЛИЧНОСТЬ: ПОДТВЕРЖДЕНА", "> ДОСТУП: ГАРАНТИРОВАН", "> СИНХРОНИЗАЦИЯ..."];
+            let i = 0;
+            const interval = setInterval(() => {
+                logBox.innerHTML += `<br>> ${logs[i]}`;
+                if (logBox.innerHTML.split('<br>').length > 8) logBox.innerHTML = logBox.innerHTML.split('<br>').slice(1).join('<br>');
+                i++;
+                if(i >= logs.length) clearInterval(interval);
+            }, 400);
+
+            setTimeout(() => {
+                core.style.borderColor = "#bc13fe";
+                core.style.boxShadow = "0 0 40px #bc13fe";
+            }, 2000);
+        }
+
+        setInterval(() => { document.getElementById('num').innerText = (220.4 + (Math.random()*0.6-0.3)).toFixed(1); }, 2000);
+        let s = 0; setInterval(() => { s++; let m=Math.floor(s/60); let sec=s%60; document.getElementById('tm').innerText = `Uptime: ${m}:${sec.toString().padStart(2,'0')}`; }, 1000);
     </script>
 </body>
 </html>
