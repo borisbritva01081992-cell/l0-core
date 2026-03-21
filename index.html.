@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #05000a; color: #bc13fe; font-family: monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+        .core { width: 200px; height: 200px; border-radius: 50%; border: 2px solid #bc13fe; box-shadow: 0 0 30px #bc13fe; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: p 2s infinite; background: radial-gradient(circle, #2a004f 0%, #05000a 80%); }
+        .v { font-size: 38px; color: #fff; font-weight: bold; text-shadow: 0 0 15px #bc13fe; }
+        @keyframes p { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 50px #bc13fe; } }
+        .btn { margin-top: 40px; border: 1px solid #00d4ff; color: #00d4ff; padding: 12px 30px; border-radius: 8px; font-size: 12px; background: none; }
+    </style>
+</head>
+<body>
+    <div style="position:absolute; top:20px; color:#00d4ff; font-size:10px; letter-spacing:2px;">SYNDICATE L0_CORE</div>
+    <div class="core">
+        <div style="font-size:10px; color:#00d4ff;">SYSTEM POWER</div>
+        <div class="v" id="num">100.0</div>
+        <div style="font-size:10px;">PROCESSED</div>
+    </div>
+    <button class="btn" onclick="tg.close()">READY FOR GROWTH</button>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        setInterval(() => { document.getElementById('num').innerText = (100 + Math.random()).toFixed(1); }, 1500);
+    </script>
+</body>
+</html>
