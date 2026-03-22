@@ -195,6 +195,33 @@
         animate();
         Telegram.WebApp.ready();
     </script>
+    <script>
+    const SERVER_URL = "https://python-core--borisbritva7013.replit.app";
+
+    // Убеждаемся, что сфера реагирует на клик
+    const coreCircle = document.querySelector('.core-circle');
+
+    if (coreCircle) {
+        coreCircle.onclick = async () => {
+            console.log("Тап зафиксирован!");
+            
+            // 1. Запускаем твою анимацию (она уже должна быть в коде)
+            if (typeof createParticle === 'function') createParticle();
+            
+            // 2. Отправляем сигнал на Replit
+            try {
+                const response = await fetch(`${SERVER_URL}/click`, {
+                    method: 'POST',
+                    mode: 'cors'
+                });
+                const data = await response.json();
+                console.log("Баланс обновлен на сервере:", data.new_balance);
+            } catch (e) {
+                console.error("Сервер Replit не отвечает:", e);
+            }
+        };
+    }
+</script>
 </body>
 </html>
 
